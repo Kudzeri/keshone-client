@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { navItems } from "../../config/navItems";
-import { FaRegHeart, FaRegUser } from "react-icons/fa";
+import { FaBars, FaRegHeart, FaRegUser } from "react-icons/fa";
 import logo from "../../assets/logo.png";
+import MobileMenu from "../layout/MobileMenu"; // 👈 импортируем
 import { RiTelegram2Fill } from "react-icons/ri";
 
 interface HeaderProps {
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout }) => {
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     onLogout();
@@ -19,13 +21,13 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout }) => {
   };
 
   return (
-    <header className=" p-4 flex gap-4 items-center justify-between px-32">
-      <div className="flex items-center gap-6">
-        <Link to="/" className="flex items-center">
-          <img src={logo} alt="KeshOne Logo" className="h-10" />
+    <header className="p-3 md:p-4 lg:p-6 flex items-center justify-between lg:px-16 xl:px-32">
+      <div className="flex items-center gap-2  lg:gap-6">
+        <Link to="/" className="flex items-center flex-shrink-0">
+          <img src={logo} alt="KeshOne Logo" className="h-8 md:h-10 lg:h-12" />
         </Link>
 
-        <nav className="flex gap-4">
+        <nav className="hidden md:flex md:gap-2 lg:gap-4">
           {navItems.map((item) => {
             if (item.authOnly && !isAuthenticated) return null;
             if (item.guestOnly && isAuthenticated) return null;
@@ -33,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className="hover:text-pink-400 bg-white px-4 py-2 rounded-xl"
+                className="hover:text-pink-400 bg-white px-3 xl:px-4 xl:py-2  rounded-xl md:text-[10px] lg:text-sm xl:text-lg  text-center"
               >
                 {item.label}
               </Link>
@@ -42,40 +44,55 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout }) => {
         </nav>
       </div>
 
-      {!isAuthenticated && (
-        <div className="flex items-center gap-4">
-          <Link
-            to="/likes"
-            className="relative px-4 py-4 bg-white rounded-xl hover:text-pink-400"
-          >
-            <FaRegHeart className="text-xl" />
-            <span className="absolute bottom-2 right-3 bg-pink-400 text-white text-[7px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              3
-            </span>
-          </Link>
-
-          <Link
-            to={"/profile"}
-            className="px-4 py-4 bg-white rounded-xl text-gray-500 hover:text-pink-400"
-          >
-            <FaRegUser className="text-xl" />
-          </Link>
-          <Link
-            to={"/messages"}
-            className="px-4 py-4 bg-white rounded-xl text-gray-500 hover:text-pink-400"
-          >
-            <RiTelegram2Fill className="text-xl" />
-          </Link>
-
-          <Link to={'/add-anketa'} className="text-white bg-linear-to-r from-[#9697FE] via-[#98A8FE] to-[#9AC0FF] py-3 px-4 rounded-2xl">Добавить Анкету</Link>
-          {/* <button
-              onClick={handleLogout}
-              className="ml-4 text-sm text-red-400 hover:text-red-200"
+      <div className="hidden md:flex items-center gap-2">
+        {!isAuthenticated && (
+          <>
+            <Link
+              to="/likes"
+              className="relative px-2 py-2 xl:px-4 bg-white rounded-xl hover:text-pink-400"
             >
-              Выйти
-            </button> */}
-        </div>
-      )}
+              <FaRegHeart className="text-md xl:text-2xl" />
+              <span className="absolute bottom-1 right-1 bg-pink-400 text-white text-[6px] font-bold rounded-full w-3 h-3 flex items-center justify-center xl:text-xs xl:w-4 xl:h-4 xl:right-2">
+                3
+              </span>
+            </Link>
+
+            <Link
+              to="/profile"
+              className="px-2 py-2 bg-white rounded-xl text-gray-500 hover:text-pink-400"
+            >
+              <FaRegUser className="text-md xl:text-2xl" />
+            </Link>
+            <Link
+              to="/messages"
+              className="px-2 py-2 bg-white rounded-xl text-gray-500 hover:text-pink-400"
+            >
+              <RiTelegram2Fill className="text-md xl:text-2xl" />
+            </Link>
+
+            <Link
+              to="/add-anketa"
+              className="text-white text-center text-sm bg-gradient-to-r from-[#9697FE] via-[#98A8FE] to-[#9AC0FF] py-2 px-3 rounded-2xl xl:text-lg"
+            >
+              Добавить Анкету
+            </Link>
+          </>
+        )}
+      </div>
+
+      {/* Бургер-меню (мобилка) */}
+      <button
+        className="md:hidden text-2xl text-gray-700"
+        onClick={() => setIsMobileMenuOpen(true)}
+      >
+        <FaBars />
+      </button>
+
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        isAuthenticated={isAuthenticated}
+      />
     </header>
   );
 };
